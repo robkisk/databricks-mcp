@@ -79,7 +79,6 @@ The Databricks MCP Server exposes the following tools:
 ### SQL Execution
 - **execute_sql**: Execute a SQL statement (warehouse_id optional if DATABRICKS_WAREHOUSE_ID env var is set)
 
-
 ### Manual Installation
 
 #### Prerequisites
