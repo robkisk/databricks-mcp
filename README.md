@@ -1,14 +1,6 @@
 <div align="center">
 
-### 🤖 **Built by [Markov](https://markov.bot)** 
-**When AI changes everything, you start from scratch.**
-
-*Markov specializes in cutting-edge AI solutions and automation. From neural ledgers to MCP servers,  
-we're building the tools that power the next generation of AI-driven applications.*
-
-💼 **We're always hiring exceptional engineers!** Join us in shaping the future of AI.
-
-**[🌐 Visit markov.bot](https://markov.bot) • [✉️ Get in Touch](mailto:olivier@markov.bot) • [🚀 Careers](mailto:olivier@markov.bot?subject=Engineering%20Career%20Opportunity)**
+### 🤖 **Databricks Custom MCP Demo** 
 
 </div>
 
@@ -18,24 +10,7 @@ we're building the tools that power the next generation of AI-driven application
 
 A Model Completion Protocol (MCP) server for Databricks that provides access to Databricks functionality via the MCP protocol. This allows LLM-powered tools to interact with Databricks clusters, jobs, notebooks, and more.
 
-> **Version 0.3.1** - Latest release with issue #9 fix and enhanced MCP client compatibility.
-
-## 🚀 One-Click Install
-
-### For Cursor Users
-**Click this link to install instantly:**
-```
-cursor://anysphere.cursor-deeplink/mcp/install?name=databricks-mcp&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJkYXRhYnJpY2tzLW1jcC1zZXJ2ZXIiXSwiZW52Ijp7IkRBVEFCUklDS1NfSE9TVCI6IiR7REFUQUJSSUNLU19IT1NUfSIsIkRBVEFCUklDS1NfVE9LRU4iOiIke0RBVEFCUklDS1NfVE9LRU59IiwiREFUQUJSSUNLU19XQVJFSE9VU0VfSUQiOiIke0RBVEFCUklDS1NfV0FSRUhPVVNFX0lEfSJ9fQ==
-```
-
-**Or copy and paste this deeplink:**
-`cursor://anysphere.cursor-deeplink/mcp/install?name=databricks-mcp&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJkYXRhYnJpY2tzLW1jcC1zZXJ2ZXIiXSwiZW52Ijp7IkRBVEFCUklDS1NfSE9TVCI6IiR7REFUQUJSSUNLU19IT1NUfSIsIkRBVEFCUklDS1NfVE9LRU4iOiIke0RBVEFCUklDS1NfVE9LRU59IiwiREFUQUJSSUNLU19XQVJFSE9VU0VfSUQiOiIke0RBVEFCUklDS1NfV0FSRUhPVVNFX0lEfSJ9fQ==`
-
-**[→ Install Databricks MCP in Cursor ←](cursor://anysphere.cursor-deeplink/mcp/install?name=databricks-mcp&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJkYXRhYnJpY2tzLW1jcC1zZXJ2ZXIiXSwiZW52Ijp7IkRBVEFCUklDS1NfSE9TVCI6IiR7REFUQUJSSUNLU19IT1NUfSIsIkRBVEFCUklDS1NfVE9LRU4iOiIke0RBVEFCUklDS1NfVE9LRU59IiwiREFUQUJSSUNLU19XQVJFSE9VU0VfSUQiOiIke0RBVEFCUklDS1NfV0FSRUhPVVNFX0lEfSJ9fQ==)**
-
-This project is maintained by Olivier Debeuf De Rijcker <olivier@markov.bot>.
-
-Credit for the initial version goes to [@JustTryAI](https://github.com/JustTryAI/databricks-mcp-server).
+Credit for the initial version goes to [@JustTryAI](https://github.com/JustTryAI/databricks-mcp-server) and [Markov](https://github.com/markov-kernel/databricks-mcp/tree/master)
 
 ## Features
 
@@ -104,39 +79,6 @@ The Databricks MCP Server exposes the following tools:
 ### SQL Execution
 - **execute_sql**: Execute a SQL statement (warehouse_id optional if DATABRICKS_WAREHOUSE_ID env var is set)
 
-## 🎉 Recent Updates (v0.3.0)
-
-**New Features - Repo Sync & Notebook Execution:**
-- ✅ **Repository Management**: Pull latest commits from Databricks repos with `pull_repo` tool
-- ✅ **One-time Notebook Execution**: Submit and wait for notebook runs with `run_notebook` tool  
-- ✅ **Composite Operations**: Combined repo sync + notebook execution with `sync_repo_and_run_notebook` tool
-- ✅ **Enhanced Job Management**: Extended job APIs with submit, status checking, and run management
-- ✅ **Comprehensive Testing**: Full test coverage for all new functionality
-
-**Bug Fixes:**
-- ✅ **Issue #9 Fixed**: Resolved "Missing required parameter 'params'" error in Cursor and other MCP clients
-- ✅ **Parameter Handling**: All MCP tools now correctly handle both nested and flat parameter structures
-- ✅ **Cursor Compatibility**: Full compatibility with Cursor's MCP implementation
-
-**Previous Updates:**
-- **v0.2.1**: Enhanced Codespaces support, documentation improvements, publishing process streamlining
-- **v0.2.0**: Major package refactoring from `src/` to `databricks_mcp/` structure
-
-**Backwards Compatibility:** All existing MCP tools continue to work unchanged. New features extend functionality without breaking changes.
-
-## Installation
-
-### Quick Install (Recommended)
-
-Use the link above to install with one click:
-
-**[→ Install Databricks MCP in Cursor ←](cursor://anysphere.cursor-deeplink/mcp/install?name=databricks-mcp&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyJkYXRhYnJpY2tzLW1jcC1zZXJ2ZXIiXSwiZW52Ijp7IkRBVEFCUklDS1NfSE9TVCI6IiR7REFUQUJSSUNLU19IT1NUfSIsIkRBVEFCUklDS1NfVE9LRU4iOiIke0RBVEFCUklDS1NfVE9LRU59IiwiREFUQUJSSUNLU19XQVJFSE9VU0VfSUQiOiIke0RBVEFCUklDS1NfV0FSRUhPVVNFX0lEfSJ9fQ==)**
-
-This will automatically install the MCP server using `uvx` and configure it in Cursor. You'll need to set these environment variables:
-
-- `DATABRICKS_HOST` - Your Databricks workspace URL
-- `DATABRICKS_TOKEN` - Your Databricks personal access token  
-- `DATABRICKS_WAREHOUSE_ID` - (Optional) Your default SQL warehouse ID
 
 ### Manual Installation
 
@@ -161,7 +103,7 @@ This will automatically install the MCP server using `uvx` and configure it in C
 
 2. Clone the repository:
    ```bash
-   git clone https://github.com/markov-kernel/databricks-mcp.git
+   git clone https://github.com/robkisk/databricks-mcp.git
    cd databricks-mcp
    ```
 
@@ -482,10 +424,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Update documentation as necessary
 4. Verify all tests pass before submitting
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## About
-
- A Model Completion Protocol (MCP) server for interacting with Databricks services. Maintained by markov.bot. 
