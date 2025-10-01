@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "genie-mcp-m": {
+      "type": "streamable-http",
+      "url": "https://<host>/api/2.0/mcp/genie/<genie space id>",
+      "headers": {
+        "Authorization": "Bearer <token>"
+      },
+      "note": "Databricks Genie for BI with natural language."
+    },
+    "uc-functions-mcp-m": {
+      "type": "streamable-http",
+      "url": "https://<host>/api/2.0/mcp/functions/<catalog>/<schema>",
+      "headers": {
+        "Authorization": "Bearer <token>"
+      },
+      "note": "Databricks UC Functions for C360."
+    },
+    "vector-search-mcp-m": {
+      "type": "streamable-http",
+      "url": "https://<host>/api/2.0/mcp/vector-search/<catalog>/<schema>",
+      "headers": {
+        "Authorization": "Bearer <token>"
+      },
+      "note": "Databricks Vector Search for C360."
+    },
+    "dbx-mcp-c": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "<path to this mcp server folder saved locally>",
+        "run",
+        "databricks-mcp-server"
+      ],
+      "env": {
+        "DATABRICKS_HOST": "",
+        "DATABRICKS_TOKEN": "",
+        "DATABRICKS_WAREHOUSE_ID": "",
+        "RUNNING_VIA_CURSOR_MCP": "true"
+      }
+    }
+  }
+}
+
