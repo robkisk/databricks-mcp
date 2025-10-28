@@ -22,7 +22,12 @@ logger = logging.getLogger(__name__)
 class DatabricksAPIError(Exception):
     """Exception raised for errors in the Databricks API."""
 
-    def __init__(self, message: str, status_code: Optional[int] = None, response: Optional[Any] = None):
+    def __init__(
+        self,
+        message: str,
+        status_code: Optional[int] = None,
+        response: Optional[Any] = None,
+    ):
         self.message = message
         self.status_code = status_code
         self.response = response
@@ -38,17 +43,17 @@ async def make_api_request(
 ) -> Dict[str, Any]:
     """
     Make a request to the Databricks API.
-    
+
     Args:
         method: HTTP method ("GET", "POST", "PUT", "DELETE")
         endpoint: API endpoint path
         data: Request body data
         params: Query parameters
         files: Files to upload
-        
+
     Returns:
         Response data as a dictionary
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
@@ -57,7 +62,9 @@ async def make_api_request(
 
     try:
         safe_data = "**REDACTED**" if data else None
-        logger.debug("API Request: %s %s Params: %s Data: %s", method, url, params, safe_data)
+        logger.debug(
+            "API Request: %s %s Params: %s Data: %s", method, url, params, safe_data
+        )
 
         async with httpx.AsyncClient() as client:
             response = await client.request(
@@ -77,7 +84,9 @@ async def make_api_request(
         return {}
 
     except HTTPError as e:
-        status_code = getattr(e.response, "status_code", None) if hasattr(e, "response") else None
+        status_code = (
+            getattr(e.response, "status_code", None) if hasattr(e, "response") else None
+        )
         error_msg = f"API request failed: {str(e)}"
 
         error_response = None
@@ -94,20 +103,20 @@ async def make_api_request(
 
 
 def format_response(
-    success: bool, 
-    data: Optional[Union[Dict[str, Any], List[Any]]] = None, 
+    success: bool,
+    data: Optional[Union[Dict[str, Any], List[Any]]] = None,
     error: Optional[str] = None,
-    status_code: int = 200
+    status_code: int = 200,
 ) -> Dict[str, Any]:
     """
     Format a standardized response.
-    
+
     Args:
         success: Whether the operation was successful
         data: Response data
         error: Error message if not successful
         status_code: HTTP status code
-        
+
     Returns:
         Formatted response dictionary
     """
@@ -115,11 +124,11 @@ def format_response(
         "success": success,
         "status_code": status_code,
     }
-    
+
     if data is not None:
         response["data"] = data
-        
+
     if error:
         response["error"] = error
-        
-    return response 
+
+    return response

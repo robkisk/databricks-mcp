@@ -7,6 +7,7 @@ import json
 import sys
 from databricks_mcp.api import clusters
 
+
 async def show_all_clusters():
     """Show all clusters in the Databricks workspace."""
     print("Fetching clusters from Databricks...")
@@ -19,5 +20,6 @@ async def show_all_clusters():
         print(f"Error listing clusters: {e}")
         return None
 
+
 if __name__ == "__main__":
-    asyncio.run(show_all_clusters()) 
+    asyncio.run(show_all_clusters())

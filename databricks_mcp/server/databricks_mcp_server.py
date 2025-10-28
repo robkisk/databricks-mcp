@@ -17,7 +17,16 @@ from mcp.server import FastMCP
 from mcp.types import TextContent
 from mcp.server.stdio import stdio_server
 
-from databricks_mcp.api import clusters, dbfs, jobs, notebooks, sql, libraries, repos, unity_catalog
+from databricks_mcp.api import (
+    clusters,
+    dbfs,
+    jobs,
+    notebooks,
+    sql,
+    libraries,
+    repos,
+    unity_catalog,
+)
 from databricks_mcp.core.config import settings
 
 # Configure logging
@@ -32,20 +41,20 @@ logger = logging.getLogger(__name__)
 def _unwrap_params(params: Dict[str, Any]) -> Dict[str, Any]:
     """
     Unwrap parameters from MCP client structure.
-    
+
     MCP clients may pass parameters in nested structure like:
     {"params": {"actual_parameter": "value"}}
-    
+
     This function handles both nested and flat parameter structures.
-    
+
     Args:
         params: Parameters from MCP client
-        
+
     Returns:
         Unwrapped parameters dictionary
     """
-    if 'params' in params and isinstance(params['params'], dict):
-        return params['params']
+    if "params" in params and isinstance(params["params"], dict):
+        return params["params"]
     return params
 
 
@@ -54,18 +63,20 @@ class DatabricksMCPServer(FastMCP):
 
     def __init__(self):
         """Initialize the Databricks MCP server."""
-        super().__init__(name="databricks-mcp", 
-                         version="0.3.1", 
-                         instructions="Use this server to manage Databricks resources")
+        super().__init__(
+            name="databricks-mcp",
+            version="0.3.1",
+            instructions="Use this server to manage Databricks resources",
+        )
         logger.info("Initializing Databricks MCP server")
         logger.info(f"Databricks host: {settings.DATABRICKS_HOST}")
-        
+
         # Register tools
         self._register_tools()
-    
+
     def _register_tools(self):
         """Register all Databricks MCP tools."""
-        
+
         # Cluster management tools
         @self.tool(
             name="list_clusters",
@@ -79,7 +90,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error listing clusters: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         @self.tool(
             name="create_cluster",
             description="Create a new Databricks cluster with parameters: cluster_name (required), spark_version (required), node_type_id (required), num_workers, autotermination_minutes",
@@ -93,7 +104,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error creating cluster: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         @self.tool(
             name="terminate_cluster",
             description="Terminate a Databricks cluster with parameter: cluster_id (required)",
@@ -102,12 +113,14 @@ class DatabricksMCPServer(FastMCP):
             logger.info(f"Terminating cluster with params: {params}")
             try:
                 actual_params = _unwrap_params(params)
-                result = await clusters.terminate_cluster(actual_params.get("cluster_id"))
+                result = await clusters.terminate_cluster(
+                    actual_params.get("cluster_id")
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error terminating cluster: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         @self.tool(
             name="get_cluster",
             description="Get information about a specific Databricks cluster with parameter: cluster_id (required)",
@@ -121,7 +134,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error getting cluster info: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         @self.tool(
             name="start_cluster",
             description="Start a terminated Databricks cluster with parameter: cluster_id (required)",
@@ -135,7 +148,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error starting cluster: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         # Job management tools
         @self.tool(
             name="list_jobs",
@@ -177,7 +190,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error deleting job: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         @self.tool(
             name="run_job",
             description="Run a Databricks job with parameters: job_id (required), notebook_params (optional)",
@@ -187,7 +200,9 @@ class DatabricksMCPServer(FastMCP):
             try:
                 actual_params = _unwrap_params(params)
                 notebook_params = actual_params.get("notebook_params", {})
-                result = await jobs.run_job(actual_params.get("job_id"), notebook_params)
+                result = await jobs.run_job(
+                    actual_params.get("job_id"), notebook_params
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error running job: {str(e)}")
@@ -215,7 +230,9 @@ class DatabricksMCPServer(FastMCP):
             name="sync_repo_and_run_notebook",
             description="Pull a repo then run a notebook. Parameters: repo_id, notebook_path, existing_cluster_id (optional), base_parameters (optional)",
         )
-        async def sync_repo_and_run_notebook(params: Dict[str, Any]) -> List[TextContent]:
+        async def sync_repo_and_run_notebook(
+            params: Dict[str, Any],
+        ) -> List[TextContent]:
             logger.info(f"Syncing repo and running notebook with params: {params}")
             try:
                 actual_params = _unwrap_params(params)
@@ -271,7 +288,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error cancelling run: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         # Notebook management tools
         @self.tool(
             name="list_notebooks",
@@ -286,7 +303,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error listing notebooks: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         @self.tool(
             name="export_notebook",
             description="Export a notebook from the workspace with parameters: path (required), format (optional, one of: SOURCE, HTML, JUPYTER, DBC)",
@@ -296,14 +313,16 @@ class DatabricksMCPServer(FastMCP):
             try:
                 actual_params = _unwrap_params(params)
                 format_type = actual_params.get("format", "SOURCE")
-                result = await notebooks.export_notebook(actual_params.get("path"), format_type)
-                
+                result = await notebooks.export_notebook(
+                    actual_params.get("path"), format_type
+                )
+
                 # For notebooks, we might want to trim the response for readability
                 content = result.get("content", "")
                 if len(content) > 1000:
                     summary = f"{content[:1000]}... [content truncated, total length: {len(content)} characters]"
                     result["content"] = summary
-                
+
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error exporting notebook: {str(e)}")
@@ -341,7 +360,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error deleting workspace object: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         # DBFS tools
         @self.tool(
             name="list_files",
@@ -368,6 +387,7 @@ class DatabricksMCPServer(FastMCP):
                 path = actual_params.get("dbfs_path")
                 content = actual_params.get("content_base64", "").encode()
                 import base64
+
                 data = base64.b64decode(content)
                 result = await dbfs.put_file(path, data)
                 return [{"text": json.dumps(result)}]
@@ -383,12 +403,15 @@ class DatabricksMCPServer(FastMCP):
             logger.info(f"Deleting DBFS path with params: {params}")
             try:
                 actual_params = _unwrap_params(params)
-                result = await dbfs.delete_file(actual_params.get("dbfs_path"), actual_params.get("recursive", False))
+                result = await dbfs.delete_file(
+                    actual_params.get("dbfs_path"),
+                    actual_params.get("recursive", False),
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error deleting file: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         @self.tool(
             name="pull_repo",
             description="Pull the latest commit for a repo with parameter: repo_id (required)",
@@ -402,7 +425,7 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error pulling repo: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         # SQL tools
         @self.tool(
             name="execute_sql",
@@ -412,17 +435,17 @@ class DatabricksMCPServer(FastMCP):
             logger.info(f"Executing SQL with params: {params}")
             try:
                 actual_params = _unwrap_params(params)
-                    
+
                 statement = actual_params.get("statement")
                 warehouse_id = actual_params.get("warehouse_id")
                 catalog = actual_params.get("catalog")
                 schema = actual_params.get("schema")
-                
+
                 result = await sql.execute_statement(
                     statement=statement,
                     warehouse_id=warehouse_id,
                     catalog=catalog,
-                    schema=schema
+                    schema=schema,
                 )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
@@ -438,7 +461,9 @@ class DatabricksMCPServer(FastMCP):
             logger.info(f"Installing library with params: {params}")
             try:
                 actual_params = _unwrap_params(params)
-                result = await libraries.install_library(actual_params.get("cluster_id"), actual_params.get("libraries", []))
+                result = await libraries.install_library(
+                    actual_params.get("cluster_id"), actual_params.get("libraries", [])
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error installing library: {str(e)}")
@@ -452,7 +477,9 @@ class DatabricksMCPServer(FastMCP):
             logger.info(f"Uninstalling library with params: {params}")
             try:
                 actual_params = _unwrap_params(params)
-                result = await libraries.uninstall_library(actual_params.get("cluster_id"), actual_params.get("libraries", []))
+                result = await libraries.uninstall_library(
+                    actual_params.get("cluster_id"), actual_params.get("libraries", [])
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error uninstalling library: {str(e)}")
@@ -462,11 +489,15 @@ class DatabricksMCPServer(FastMCP):
             name="list_cluster_libraries",
             description="List library status for a cluster with parameter: cluster_id",
         )
-        async def list_cluster_libraries_tool(params: Dict[str, Any]) -> List[TextContent]:
+        async def list_cluster_libraries_tool(
+            params: Dict[str, Any],
+        ) -> List[TextContent]:
             logger.info(f"Listing cluster libraries with params: {params}")
             try:
                 actual_params = _unwrap_params(params)
-                result = await libraries.list_cluster_libraries(actual_params.get("cluster_id"))
+                result = await libraries.list_cluster_libraries(
+                    actual_params.get("cluster_id")
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error listing cluster libraries: {str(e)}")
@@ -523,31 +554,35 @@ class DatabricksMCPServer(FastMCP):
             except Exception as e:
                 logger.error(f"Error listing repos: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         # Workspace file tools
         @self.tool(
             name="get_workspace_file_content",
             description="Retrieve the content of a file from Databricks workspace with parameters: workspace_path (required), format (optional: SOURCE, HTML, JUPYTER, DBC - default SOURCE)",
         )
-        async def get_workspace_file_content(params: Dict[str, Any]) -> List[TextContent]:
+        async def get_workspace_file_content(
+            params: Dict[str, Any],
+        ) -> List[TextContent]:
             logger.info(f"Getting workspace file content with params: {params}")
             try:
                 actual_params = _unwrap_params(params)
-                    
+
                 workspace_path = actual_params.get("workspace_path")
                 format_type = actual_params.get("format", "SOURCE")
-                
+
                 if not workspace_path:
                     raise ValueError("workspace_path is required")
-                
+
                 # Use the workspace export API
-                result = await notebooks.export_workspace_file(workspace_path, format_type)
+                result = await notebooks.export_workspace_file(
+                    workspace_path, format_type
+                )
                 return [{"text": json.dumps(result)}]
-                
+
             except Exception as e:
                 logger.error(f"Error getting workspace file content: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
-        
+
         @self.tool(
             name="get_workspace_file_info",
             description="Get metadata about a workspace file with parameters: workspace_path (required)",
@@ -579,39 +614,57 @@ class DatabricksMCPServer(FastMCP):
                 logger.error(f"Error listing catalogs: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
 
-        @self.tool(name="create_catalog", description="Create a catalog with parameters: name, comment")
+        @self.tool(
+            name="create_catalog",
+            description="Create a catalog with parameters: name, comment",
+        )
         async def create_catalog_tool(params: Dict[str, Any]) -> List[TextContent]:
             try:
                 actual_params = _unwrap_params(params)
-                result = await unity_catalog.create_catalog(actual_params.get("name"), actual_params.get("comment"))
+                result = await unity_catalog.create_catalog(
+                    actual_params.get("name"), actual_params.get("comment")
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error creating catalog: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
 
-        @self.tool(name="list_schemas", description="List schemas for a catalog with parameter: catalog_name")
+        @self.tool(
+            name="list_schemas",
+            description="List schemas for a catalog with parameter: catalog_name",
+        )
         async def list_schemas_tool(params: Dict[str, Any]) -> List[TextContent]:
             try:
                 actual_params = _unwrap_params(params)
-                result = await unity_catalog.list_schemas(actual_params.get("catalog_name"))
+                result = await unity_catalog.list_schemas(
+                    actual_params.get("catalog_name")
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error listing schemas: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
 
-        @self.tool(name="create_schema", description="Create schema with parameters: catalog_name, name, comment")
+        @self.tool(
+            name="create_schema",
+            description="Create schema with parameters: catalog_name, name, comment",
+        )
         async def create_schema_tool(params: Dict[str, Any]) -> List[TextContent]:
             try:
                 actual_params = _unwrap_params(params)
                 result = await unity_catalog.create_schema(
-                    actual_params.get("catalog_name"), actual_params.get("name"), actual_params.get("comment")
+                    actual_params.get("catalog_name"),
+                    actual_params.get("name"),
+                    actual_params.get("comment"),
                 )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error creating schema: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
 
-        @self.tool(name="list_tables", description="List tables with parameters: catalog_name, schema_name")
+        @self.tool(
+            name="list_tables",
+            description="List tables with parameters: catalog_name, schema_name",
+        )
         async def list_tables_tool(params: Dict[str, Any]) -> List[TextContent]:
             try:
                 actual_params = _unwrap_params(params)
@@ -623,21 +676,31 @@ class DatabricksMCPServer(FastMCP):
                 logger.error(f"Error listing tables: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
 
-        @self.tool(name="create_table", description="Create table via SQL with parameters: warehouse_id, statement")
+        @self.tool(
+            name="create_table",
+            description="Create table via SQL with parameters: warehouse_id, statement",
+        )
         async def create_table_tool(params: Dict[str, Any]) -> List[TextContent]:
             try:
                 actual_params = _unwrap_params(params)
-                result = await unity_catalog.create_table(actual_params.get("warehouse_id"), actual_params.get("statement"))
+                result = await unity_catalog.create_table(
+                    actual_params.get("warehouse_id"), actual_params.get("statement")
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error creating table: {str(e)}")
                 return [{"text": json.dumps({"error": str(e)})}]
 
-        @self.tool(name="get_table_lineage", description="Get table lineage with parameter: full_name")
+        @self.tool(
+            name="get_table_lineage",
+            description="Get table lineage with parameter: full_name",
+        )
         async def get_table_lineage_tool(params: Dict[str, Any]) -> List[TextContent]:
             try:
                 actual_params = _unwrap_params(params)
-                result = await unity_catalog.get_table_lineage(actual_params.get("full_name"))
+                result = await unity_catalog.get_table_lineage(
+                    actual_params.get("full_name")
+                )
                 return [{"text": json.dumps(result)}]
             except Exception as e:
                 logger.error(f"Error getting lineage: {str(e)}")
@@ -648,20 +711,20 @@ def main():
     """Main entry point for the MCP server."""
     try:
         logger.info("Starting Databricks MCP server")
-        
+
         # Turn off buffering in stdout
-        if hasattr(sys.stdout, 'reconfigure'):
+        if hasattr(sys.stdout, "reconfigure"):
             sys.stdout.reconfigure(line_buffering=True)
-        
+
         server = DatabricksMCPServer()
-        
+
         # Use the FastMCP run method which handles async internally
         server.run()
-            
+
     except Exception as e:
         logger.error(f"Error in Databricks MCP server: {str(e)}", exc_info=True)
         raise
 
 
 if __name__ == "__main__":
-    main() 
+    main()

@@ -64,5 +64,6 @@ addopts = "-v --tb=short"
 [dependency-groups]
 dev = [
     "build>=1.2.2.post1",
+    "ruff>=0.14.2",
     "twine>=6.1.0",
 ]

@@ -10,6 +10,7 @@ from typing import Any, Dict, Optional
 if not os.environ.get("RUNNING_VIA_CURSOR_MCP"):
     try:
         from dotenv import load_dotenv
+
         # Load .env file if it exists
         if load_dotenv():
             print("Successfully loaded .env file")
@@ -31,18 +32,20 @@ class Settings(BaseSettings):
     """Base settings for the application."""
 
     # Databricks API configuration
-    DATABRICKS_HOST: str = os.environ.get("DATABRICKS_HOST", "https://example.databricks.net")
+    DATABRICKS_HOST: str = os.environ.get(
+        "DATABRICKS_HOST", "https://example.databricks.net"
+    )
     DATABRICKS_TOKEN: str = os.environ.get("DATABRICKS_TOKEN", "dapi_token_placeholder")
     DATABRICKS_WAREHOUSE_ID: Optional[str] = os.environ.get("DATABRICKS_WAREHOUSE_ID")
 
     # Server configuration
-    SERVER_HOST: str = os.environ.get("SERVER_HOST", "0.0.0.0") 
+    SERVER_HOST: str = os.environ.get("SERVER_HOST", "0.0.0.0")
     SERVER_PORT: int = int(os.environ.get("SERVER_PORT", "8000"))
     DEBUG: bool = os.environ.get("DEBUG", "False").lower() == "true"
 
     # Logging
     LOG_LEVEL: str = os.environ.get("LOG_LEVEL", "INFO")
-    
+
     # Version
     VERSION: str = VERSION
 
@@ -58,6 +61,7 @@ class Settings(BaseSettings):
         """Validate warehouse ID format if provided."""
         if v and len(v) < 10:
             import logging
+
             logger = logging.getLogger(__name__)
             logger.warning(f"Warehouse ID '{v}' seems unusually short")
         return v
@@ -84,10 +88,10 @@ def get_api_headers() -> Dict[str, str]:
 def get_databricks_api_url(endpoint: str) -> str:
     """
     Construct the full Databricks API URL.
-    
+
     Args:
         endpoint: The API endpoint path, e.g., "/api/2.0/clusters/list"
-    
+
     Returns:
         Full URL to the Databricks API endpoint
     """
@@ -97,5 +101,5 @@ def get_databricks_api_url(endpoint: str) -> str:
 
     # Remove trailing slash from host if present
     host = settings.DATABRICKS_HOST.rstrip("/")
-    
-    return f"{host}{endpoint}" 
+
+    return f"{host}{endpoint}"

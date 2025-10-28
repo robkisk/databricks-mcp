@@ -18,18 +18,26 @@ async def create_catalog(name: str, comment: Optional[str] = None) -> Dict[str, 
     payload = {"name": name}
     if comment:
         payload["comment"] = comment
-    return await make_api_request("POST", "/api/2.1/unity-catalog/catalogs", data=payload)
+    return await make_api_request(
+        "POST", "/api/2.1/unity-catalog/catalogs", data=payload
+    )
 
 
 async def list_schemas(catalog_name: str) -> Dict[str, Any]:
-    return await make_api_request("GET", "/api/2.1/unity-catalog/schemas", params={"catalog_name": catalog_name})
+    return await make_api_request(
+        "GET", "/api/2.1/unity-catalog/schemas", params={"catalog_name": catalog_name}
+    )
 
 
-async def create_schema(catalog_name: str, name: str, comment: Optional[str] = None) -> Dict[str, Any]:
+async def create_schema(
+    catalog_name: str, name: str, comment: Optional[str] = None
+) -> Dict[str, Any]:
     payload = {"catalog_name": catalog_name, "name": name}
     if comment:
         payload["comment"] = comment
-    return await make_api_request("POST", "/api/2.1/unity-catalog/schemas", data=payload)
+    return await make_api_request(
+        "POST", "/api/2.1/unity-catalog/schemas", data=payload
+    )
 
 
 async def list_tables(catalog_name: str, schema_name: str) -> Dict[str, Any]:

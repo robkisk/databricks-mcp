@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 async def create_job(job_config: Union[Job, Dict[str, Any]]) -> Dict[str, Any]:
     """
     Create a new Databricks job.
-    
+
     Args:
         job_config: Job configuration
-        
+
     Returns:
         Response containing the job ID
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
@@ -37,36 +37,38 @@ async def create_job(job_config: Union[Job, Dict[str, Any]]) -> Dict[str, Any]:
     return await make_api_request("POST", "/api/2.2/jobs/create", data=payload)
 
 
-async def run_job(job_id: int, notebook_params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+async def run_job(
+    job_id: int, notebook_params: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """
     Run a job now.
-    
+
     Args:
         job_id: ID of the job to run
         notebook_params: Optional parameters for the notebook
-        
+
     Returns:
         Response containing the run ID
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
     logger.info(f"Running job: {job_id}")
-    
+
     run_params = {"job_id": job_id}
     if notebook_params:
         run_params["notebook_params"] = notebook_params
-        
+
     return await make_api_request("POST", "/api/2.0/jobs/run-now", data=run_params)
 
 
 async def list_jobs() -> Dict[str, Any]:
     """
     List all jobs.
-    
+
     Returns:
         Response containing a list of jobs
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
@@ -77,13 +79,13 @@ async def list_jobs() -> Dict[str, Any]:
 async def get_job(job_id: int) -> Dict[str, Any]:
     """
     Get information about a specific job.
-    
+
     Args:
         job_id: ID of the job
-        
+
     Returns:
         Response containing job information
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
@@ -94,59 +96,60 @@ async def get_job(job_id: int) -> Dict[str, Any]:
 async def update_job(job_id: int, new_settings: Dict[str, Any]) -> Dict[str, Any]:
     """
     Update an existing job.
-    
+
     Args:
         job_id: ID of the job to update
         new_settings: New job settings
-        
+
     Returns:
         Empty response on success
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
     logger.info(f"Updating job: {job_id}")
-    
-    update_data = {
-        "job_id": job_id,
-        "new_settings": new_settings
-    }
-    
+
+    update_data = {"job_id": job_id, "new_settings": new_settings}
+
     return await make_api_request("POST", "/api/2.0/jobs/update", data=update_data)
 
 
 async def delete_job(job_id: int) -> Dict[str, Any]:
     """
     Delete a job.
-    
+
     Args:
         job_id: ID of the job to delete
-        
+
     Returns:
         Empty response on success
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
     logger.info(f"Deleting job: {job_id}")
-    return await make_api_request("POST", "/api/2.2/jobs/delete", data={"job_id": job_id})
+    return await make_api_request(
+        "POST", "/api/2.2/jobs/delete", data={"job_id": job_id}
+    )
 
 
 async def get_run(run_id: int) -> Dict[str, Any]:
     """
     Get information about a specific job run.
-    
+
     Args:
         run_id: ID of the run
-        
+
     Returns:
         Response containing run information
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
     logger.info(f"Getting information for run: {run_id}")
-    return await make_api_request("GET", "/api/2.1/jobs/runs/get", params={"run_id": run_id})
+    return await make_api_request(
+        "GET", "/api/2.1/jobs/runs/get", params={"run_id": run_id}
+    )
 
 
 async def list_runs(job_id: Optional[int] = None, limit: int = 20) -> Dict[str, Any]:
@@ -172,18 +175,20 @@ async def get_run_status(run_id: int) -> Dict[str, Any]:
 async def cancel_run(run_id: int) -> Dict[str, Any]:
     """
     Cancel a job run.
-    
+
     Args:
         run_id: ID of the run to cancel
-        
+
     Returns:
         Empty response on success
-        
+
     Raises:
         DatabricksAPIError: If the API request fails
     """
     logger.info(f"Cancelling run: {run_id}")
-    return await make_api_request("POST", "/api/2.1/jobs/runs/cancel", data={"run_id": run_id})
+    return await make_api_request(
+        "POST", "/api/2.1/jobs/runs/cancel", data={"run_id": run_id}
+    )
 
 
 async def submit_run(run_config: Dict[str, Any]) -> Dict[str, Any]:
@@ -202,7 +207,9 @@ async def submit_run(run_config: Dict[str, Any]) -> Dict[str, Any]:
 async def get_run_output(run_id: int) -> Dict[str, Any]:
     """Get the output of a run."""
     logger.info(f"Fetching output for run {run_id}")
-    return await make_api_request("GET", "/api/2.0/jobs/runs/get-output", params={"run_id": run_id})
+    return await make_api_request(
+        "GET", "/api/2.0/jobs/runs/get-output", params={"run_id": run_id}
+    )
 
 
 async def await_until_state(
@@ -219,7 +226,9 @@ async def await_until_state(
         if state == desired_state:
             return run_info
         if time.monotonic() - start > timeout_seconds:
-            raise TimeoutError(f"Run {run_id} did not reach state {desired_state} within {timeout_seconds}s")
+            raise TimeoutError(
+                f"Run {run_id} did not reach state {desired_state} within {timeout_seconds}s"
+            )
         await asyncio.sleep(poll_interval_seconds)
 
 
@@ -246,7 +255,11 @@ async def run_notebook(
     if not run_id:
         raise ValueError("submit_run did not return a run_id")
 
-    await await_until_state(run_id, timeout_seconds=timeout_seconds, poll_interval_seconds=poll_interval_seconds)
+    await await_until_state(
+        run_id,
+        timeout_seconds=timeout_seconds,
+        poll_interval_seconds=poll_interval_seconds,
+    )
     output = await get_run_output(run_id)
     output["run_id"] = run_id
     return output

@@ -26,4 +26,3 @@ async def test_list_catalogs():
     resp = await unity_catalog.list_catalogs()
     assert resp["catalogs"] == []
     unity_catalog.list_catalogs.assert_called_once()
-

@@ -7,6 +7,7 @@ import json
 import sys
 from databricks_mcp.api import notebooks
 
+
 async def show_all_notebooks():
     """Show all notebooks in the Databricks workspace."""
     print("Fetching notebooks from Databricks...")
@@ -19,5 +20,6 @@ async def show_all_notebooks():
         print(f"Error listing notebooks: {e}")
         return None
 
+
 if __name__ == "__main__":
-    asyncio.run(show_all_notebooks()) 
+    asyncio.run(show_all_notebooks())

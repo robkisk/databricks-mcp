@@ -10,7 +10,10 @@ import logging
 import sys
 from typing import List, Optional
 
-from databricks_mcp.server.databricks_mcp_server import DatabricksMCPServer, main as server_main
+from databricks_mcp.server.databricks_mcp_server import (
+    DatabricksMCPServer,
+    main as server_main,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -23,16 +26,16 @@ logger = logging.getLogger(__name__)
 def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="Databricks MCP Server CLI")
-    
+
     # Create subparsers for different commands
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
-    
+
     # Start server command
     start_parser = subparsers.add_parser("start", help="Start the MCP server")
     start_parser.add_argument(
         "--debug", action="store_true", help="Enable debug logging"
     )
-    
+
     # List tools command
     list_parser = subparsers.add_parser("list-tools", help="List available tools")
 
@@ -55,7 +58,7 @@ async def list_tools() -> None:
     """List all available tools in the server."""
     server = DatabricksMCPServer()
     tools = await server.list_tools()
-    
+
     print("\nAvailable tools:")
     for tool in tools:
         print(f"  - {tool.name}: {tool.description}")
@@ -84,11 +87,11 @@ async def sync_run(repo_id: int, notebook_path: str, cluster_id: Optional[str]) 
 def main(args: Optional[List[str]] = None) -> int:
     """Main entry point for the CLI."""
     parsed_args = parse_args(args)
-    
+
     # Set log level
     if hasattr(parsed_args, "debug") and parsed_args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
-    
+
     # Execute the appropriate command
     if parsed_args.command == "start":
         logger.info("Starting Databricks MCP server")
@@ -98,14 +101,18 @@ def main(args: Optional[List[str]] = None) -> int:
     elif parsed_args.command == "version":
         show_version()
     elif parsed_args.command == "sync-run":
-        asyncio.run(sync_run(parsed_args.repo_id, parsed_args.notebook_path, parsed_args.cluster_id))
+        asyncio.run(
+            sync_run(
+                parsed_args.repo_id, parsed_args.notebook_path, parsed_args.cluster_id
+            )
+        )
     else:
         # If no command is provided, show help
         parse_args(["--help"])
         return 1
-    
+
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())
